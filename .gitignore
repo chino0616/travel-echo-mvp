@@ -33,7 +33,18 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# IDE
+.idea/
+.vscode/
+
+# Storage
+/public/storage/
+/temp/
+
+# System Files
+.DS_Store
+Thumbs.db
+
 # uploads
 /public/uploads/
-/public/videos/
-/temp/ 
+/public/videos/ 

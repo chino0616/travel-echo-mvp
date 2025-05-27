@@ -1,52 +1,64 @@
-# Travel Echo - 旅人記憶共鳴系統 🌏✈️
+# Travel Echo — AI 旅程記憶共鳴系統
 
-Travel Echo 是一個專為旅行者打造的回憶生成平台，通過 AI 技術將旅行經歷轉化為獨特的視覺記憶。
+## 專案概述
+Travel Echo 是一個以 AI 為核心的個人化旅後內容生成體驗模組，能夠根據使用者的旅程資料、語氣風格與圖像素材，產出可回顧、可保存、可分享的故事式內容。
 
 ## 核心功能
+- 🤖 **AI 語氣模擬**：從使用者評論學習語氣，生成個人化文字
+- 📸 **照片處理**：自動處理和優化上傳的照片
+- 🎬 **影片生成**：將照片和文字合成為精美的回憶影片
+- 🌐 **社群分享**：支援多平台內容分享
 
-- 🎬 自動生成 15 秒旅行回憶短片
-- 📸 支援用戶照片上傳與管理
-- ✍️ AI 智能文案生成（支援多種語氣風格）
-- 🔄 一鍵分享至社交媒體
-- 📱 旅後智能提醒功能
+## 技術棧
+- **前端**：Next.js, React, Material-UI
+- **後端**：Next.js API Routes
+- **影片處理**：FFmpeg
+- **AI 服務**：OpenAI API
+- **存儲**：本地文件系統
 
-## 技術架構
+## 快速開始
 
-- Frontend: Next.js + TypeScript
-- Backend: Node.js + Express
-- Database: PostgreSQL
-- AI Integration: OpenAI API
-- Video Processing: FFMPEG
-- Cloud Storage: AWS S3
-- Authentication: JWT
+### 環境要求
+- Node.js 18+
+- FFmpeg
+- OpenAI API Key
 
-## 開發環境設置
+### 安裝步驟
+1. 克隆專案
+```bash
+git clone https://github.com/chino0616/travel-echo-mvp.git
+cd travel-echo-mvp
+```
 
-1. 安裝依賴：
+2. 安裝依賴
 ```bash
 npm install
 ```
 
-2. 設置環境變數：
+3. 設置環境變數
 ```bash
 cp .env.example .env
+# 編輯 .env 文件，填入必要的配置
 ```
 
-3. 啟動開發服務器：
+4. 啟動開發服務器
 ```bash
 npm run dev
 ```
 
-## API 文檔
+## 文檔
+- [產品需求文件 (PRD)](docs/PRD.md)
+- [系統架構設計 (SASD)](docs/architecture/SASD.md)
 
-API 文檔請參考 `/docs/api.md`
+## 開發進度
+- [x] 基礎架構搭建
+- [x] 照片上傳功能
+- [x] 影片生成核心邏輯
+- [ ] AI 文案生成
+- [ ] 社交分享功能
 
-## 環境要求
-
-- Node.js >= 18
-- PostgreSQL >= 14
-- FFMPEG >= 4.4
+## 貢獻指南
+歡迎提交 Issue 和 Pull Request！
 
 ## 授權
-
-© 2024 Travel Echo. All rights reserved. 
+本專案採用 MIT 授權條款 - 詳見 [LICENSE](LICENSE) 文件 
