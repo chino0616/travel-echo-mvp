@@ -16,15 +16,24 @@ export const mockMemoryTexts = {
   ]
 };
 
-// 模擬影片生成延遲時間（毫秒）
-export const MOCK_VIDEO_DELAY = 3000;
-
-// 模擬影片生成進度回饋
 export interface GenerationProgress {
   stage: '準備照片' | '生成影片' | '添加文字' | '完成';
-  progress: number; // 0-100
+  progress: number;
 }
 
+export interface GenerationResponse {
+  success: boolean;
+  videoUrl?: string;
+  error?: string;
+}
+
+// 開發環境標誌
+export const isDevelopment = process.env.NODE_ENV === 'development';
+
+// 模擬影片生成延遲時間（毫秒）
+export const MOCK_VIDEO_DELAY = 2000;
+
+// 模擬影片生成
 export const mockVideoGeneration = async (
   photos: string[],
   text: string,
@@ -34,20 +43,20 @@ export const mockVideoGeneration = async (
   const stages: GenerationProgress['stage'][] = ['準備照片', '生成影片', '添加文字', '完成'];
   
   for (const stage of stages) {
-    // 每個階段模擬進度從 0 到 100
-    for (let progress = 0; progress <= 100; progress += 20) {
-      onProgress?.({
-        stage,
-        progress,
-      });
-      // 每 20% 暫停一下
-      await new Promise(resolve => setTimeout(resolve, MOCK_VIDEO_DELAY / 25));
-    }
+    onProgress?.({
+      stage,
+      progress: 0
+    });
+    await new Promise(resolve => setTimeout(resolve, MOCK_VIDEO_DELAY / 4));
+    onProgress?.({
+      stage,
+      progress: 100
+    });
   }
 
-  // 回傳一個示例影片 URL
-  return 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+  // 使用本地生成的影片
+  const timestamp = Date.now();
+  return `/storage/videos/video-${timestamp}.mp4`;
 };
 
-export const isDevelopment = process.env.NODE_ENV === 'development';
 export const useMockAPI = process.env.USE_MOCK_API === 'true'; 
