@@ -1,11 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-const openai = new OpenAIApi(configuration);
 
 export default async function handler(
   req: NextApiRequest,
@@ -35,7 +33,7 @@ export default async function handler(
       請用100字以內生成一段富有情感的旅行回憶描述。
     `;
 
-    const completion = await openai.createChatCompletion({
+    const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
         {
@@ -49,7 +47,7 @@ export default async function handler(
       ]
     });
 
-    const generatedContent = completion.data.choices[0]?.message?.content;
+    const generatedContent = completion.choices[0]?.message?.content;
 
     if (!generatedContent) {
       throw new Error('無法生成內容');
