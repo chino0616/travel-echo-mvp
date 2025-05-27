@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import OpenAI from 'openai';
+import { mockMemoryTexts, isDevelopment, useMockAPI } from '@/utils/mockResponses';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -20,6 +21,16 @@ export default async function handler(
       return res.status(400).json({ message: '缺少必要參數' });
     }
 
+    // 在開發環境且啟用模擬模式時，使用預設回應
+    if (isDevelopment && useMockAPI) {
+      const moodTexts = mockMemoryTexts[mood as keyof typeof mockMemoryTexts];
+      const randomIndex = Math.floor(Math.random() * moodTexts.length);
+      return res.status(200).json({ content: moodTexts[randomIndex] });
+    }
+
+    // 使用較便宜的 GPT-3.5-turbo 模型進行開發
+    const model = isDevelopment ? "gpt-3.5-turbo" : "gpt-4";
+
     // 根據心情生成不同的提示詞
     const moodPrompts = {
       文青: '以文藝優雅的方式描述這段旅程',
@@ -34,7 +45,7 @@ export default async function handler(
     `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+      model,
       messages: [
         {
           role: "system",
