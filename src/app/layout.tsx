@@ -1,6 +1,14 @@
-'use client';
+import './globals.css';
+import { Inter } from 'next/font/google';
+import { Metadata } from 'next';
+import { Providers } from './providers';
 
-import { DemoProvider } from '@/contexts/DemoContext';
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
+  title: 'Travel Echo - 旅人記憶共鳴系統',
+  description: '將您的旅行回憶轉化為獨特的視覺記憶',
+};
 
 export default function RootLayout({
   children,
@@ -9,10 +17,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-TW">
-      <body>
-        <DemoProvider>
+      <body className={inter.className}>
+        <Providers>
           {children}
-        </DemoProvider>
+        </Providers>
       </body>
     </html>
   );

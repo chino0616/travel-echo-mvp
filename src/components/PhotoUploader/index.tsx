@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import Image from 'next/image';
 
 export interface PhotoUploaderProps {
   onPhotosSelected: (photos: string[]) => void;
@@ -40,7 +39,10 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: acceptedTypes.reduce((acc, type) => ({ ...acc, [type]: [] }), {}),
-    maxFiles: maxPhotos
+    maxFiles: maxPhotos,
+    noClick: false,
+    noKeyboard: false,
+    preventDropOnDocument: true
   });
 
   const removePhoto = (index: number) => {
@@ -50,10 +52,10 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
   };
 
   return (
-    <div className="w-full space-y-4">
+    <div className="space-y-4">
       <div
         {...getRootProps()}
-        className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
+        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
           ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}
       >
         <input {...getInputProps()} />
@@ -70,28 +72,33 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
       </div>
 
       {previews.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {previews.map((preview, index) => (
             <div key={index} className="relative group">
-              <div className="aspect-w-3 aspect-h-2 rounded-lg overflow-hidden">
-                <Image
+              <div className="relative w-full pt-[100%] rounded-lg overflow-hidden">
+                <img
                   src={preview}
                   alt={`上傳的照片 ${index + 1}`}
-                  layout="fill"
-                  objectFit="cover"
-                  className="rounded-lg"
+                  className="absolute inset-0 w-full h-full object-cover rounded-lg select-none"
+                  style={{ pointerEvents: 'none' }}
                 />
+                <div 
+                  className="absolute inset-0 bg-black opacity-0 group-hover:opacity-30 transition-opacity"
+                />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removePhoto(index);
+                  }}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1
+                    opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                  aria-label="移除照片"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-              <button
-                onClick={() => removePhoto(index)}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1
-                  opacity-0 group-hover:opacity-100 transition-opacity"
-                aria-label="移除照片"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
             </div>
           ))}
         </div>
