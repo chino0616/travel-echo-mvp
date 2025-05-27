@@ -1,8 +1,8 @@
 export const mockMemoryTexts = {
   文青: [
-    "在京都的小巷中，陽光灑落在古老的石板上，時光彷彿靜止。那一刻，我感受到了永恆的寧靜，彷彿整個世界都在低聲詠唱著古老的和歌。",
+    "在京都的小巷中，陽光灑落在古老的石板上，時光彷彿靜止。那一刻，我感受到了永恆的寧靜，彷彿整個世界都在低聲詠唱著古老和歌。",
     "漫步在威尼斯的彩色島嶼，布拉諾的色彩如同水彩暈染開來。每一扇窗，每一個轉角，都是一幅未完成的畫作。",
-    "清晨的富士山，雲霧繚繞間若隱若現。手中的咖啡還在冒著熱氣，這一刻的寧靜，只屬於我和這座神聖的山。"
+    "清晨的富士山，雲霧繞間若隱若現。手中的咖啡還在冒著熱氣，這一刻的寧靜，只屬於我和這座神聖的山。"
   ],
   幽默: [
     "誰說迷路不是旅行的樂趣？今天在巴黎繞了三個圈，發現了五家甜點店，結果晚餐吃了三個可頌。嘿，這才是真正的法式生活！",
@@ -14,6 +14,39 @@ export const mockMemoryTexts = {
     "清邁的夜市裡，一盞盞燈籠照亮了異鄉的夜。在這裡，我找到了勇氣，也找到了自己。",
     "在馬丘比丘的晨霧中，我終於明白了旅行的意義。不是為了逃離，而是為了在遠方遇見更好的自己。"
   ]
+};
+
+// 模擬影片生成延遲時間（毫秒）
+export const MOCK_VIDEO_DELAY = 3000;
+
+// 模擬影片生成進度回饋
+export interface GenerationProgress {
+  stage: '準備照片' | '生成影片' | '添加文字' | '完成';
+  progress: number; // 0-100
+}
+
+export const mockVideoGeneration = async (
+  photos: string[],
+  text: string,
+  onProgress?: (progress: GenerationProgress) => void
+): Promise<string> => {
+  // 模擬各階段進度
+  const stages: GenerationProgress['stage'][] = ['準備照片', '生成影片', '添加文字', '完成'];
+  
+  for (const stage of stages) {
+    // 每個階段模擬進度從 0 到 100
+    for (let progress = 0; progress <= 100; progress += 20) {
+      onProgress?.({
+        stage,
+        progress,
+      });
+      // 每 20% 暫停一下
+      await new Promise(resolve => setTimeout(resolve, MOCK_VIDEO_DELAY / 25));
+    }
+  }
+
+  // 回傳一個示例影片 URL
+  return 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 };
 
 export const isDevelopment = process.env.NODE_ENV === 'development';

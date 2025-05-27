@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import { mockMemoryTexts, isDevelopment, useMockAPI } from '@/utils/mockResponses';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || 'sk-demo-key',
 });
 
 export default async function handler(
@@ -22,8 +22,8 @@ export default async function handler(
     }
 
     // 在開發環境且啟用模擬模式時，使用預設回應
-    if (isDevelopment && useMockAPI) {
-      const moodTexts = mockMemoryTexts[mood as keyof typeof mockMemoryTexts];
+    if (isDevelopment) {
+      const moodTexts = mockMemoryTexts[mood as keyof typeof mockMemoryTexts] || mockMemoryTexts['文青'];
       const randomIndex = Math.floor(Math.random() * moodTexts.length);
       return res.status(200).json({ content: moodTexts[randomIndex] });
     }

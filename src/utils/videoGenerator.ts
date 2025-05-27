@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import axios from 'axios';
 import { LocalStorageHandler } from './localStorageHandler';
+import { GenerationProgress } from './mockResponses';
 
 interface VideoGeneratorOptions {
   photos: string[];  // 照片 URL 列表
@@ -17,10 +18,16 @@ export class VideoGenerator {
     this.storage = new LocalStorageHandler();
   }
 
-  async generateVideo(options: VideoGeneratorOptions): Promise<string> {
+  async generateVideo(
+    options: VideoGeneratorOptions,
+    onProgress?: (progress: GenerationProgress) => void
+  ): Promise<string> {
     const { photos, text, duration } = options;
     const tempDir = path.join(process.cwd(), 'temp');
     const outputPath = path.join(tempDir, `output-${Date.now()}.mp4`);
+
+    // 回報準備階段
+    onProgress?.({ stage: '準備照片', progress: 0 });
 
     // 確保臨時目錄存在
     await fs.mkdir(tempDir, { recursive: true });
@@ -30,12 +37,23 @@ export class VideoGenerator {
       photos.map(async (url, index) => {
         const photoPath = path.join(tempDir, `photo-${index}.jpg`);
         await this.downloadFile(url, photoPath);
+        // 回報下載進度
+        onProgress?.({ 
+          stage: '準備照片', 
+          progress: Math.round((index + 1) / photos.length * 100) 
+        });
         return photoPath;
       })
     );
 
+    // 回報開始生成影片
+    onProgress?.({ stage: '生成影片', progress: 0 });
+
     // 生成影片
-    await this.createVideo(localPhotos, text, duration, outputPath);
+    await this.createVideo(localPhotos, text, duration, outputPath, onProgress);
+
+    // 回報開始添加文字
+    onProgress?.({ stage: '添加文字', progress: 0 });
 
     // 讀取生成的影片
     const videoBuffer = await fs.readFile(outputPath);
@@ -45,6 +63,9 @@ export class VideoGenerator {
 
     // 清理臨時文件
     await this.cleanup(tempDir);
+
+    // 回報完成
+    onProgress?.({ stage: '完成', progress: 100 });
 
     return videoUrl;
   }
@@ -71,7 +92,8 @@ export class VideoGenerator {
     photos: string[],
     text: string,
     duration: number,
-    outputPath: string
+    outputPath: string,
+    onProgress?: (progress: GenerationProgress) => void
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const command = ffmpeg();
@@ -82,6 +104,14 @@ export class VideoGenerator {
           .input(photo)
           .duration(duration / photos.length)
           .inputOptions(['-loop 1']);
+      });
+
+      // 添加進度監聽
+      command.on('progress', (progress: { percent?: number }) => {
+        onProgress?.({
+          stage: '生成影片',
+          progress: Math.min(Math.round(progress.percent || 0), 100)
+        });
       });
 
       // 添加文字
@@ -97,11 +127,16 @@ export class VideoGenerator {
               y: 'h-th-50',
               shadowcolor: 'black',
               shadowx: 2,
-              shadowy: 2
+              shadowy: 2,
+              // 添加淡入淡出效果
+              alpha: 'if(lt(t,1),t,if(lt(t,duration-1),1,duration-t))'
             }
           }
         ])
-        .on('end', resolve)
+        .on('end', () => {
+          onProgress?.({ stage: '添加文字', progress: 100 });
+          resolve();
+        })
         .on('error', reject)
         .save(outputPath);
     });
